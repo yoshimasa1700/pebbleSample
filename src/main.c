@@ -31,6 +31,15 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
   text_layer_set_text(time_layer, buffer);
 }
 
+void init_time(){
+  struct tm *t;
+  time_t temp;
+  temp = time(NULL);
+  t = localtime(&temp);
+
+  tick_handler(t, SECOND_UNIT);
+}
+
 // init window
 void window_load(Window *window){
   create_text_layer();
@@ -39,6 +48,8 @@ void window_load(Window *window){
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
   
   set_text_layer();
+
+  init_time();
 }
 
 // deinit window
