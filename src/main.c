@@ -6,22 +6,37 @@ Window *window;
 // テキストレイヤ
 TextLayer *text_layer;
 TextLayer *time_layer;
+TextLayer *acc_layer;
 
 // 時間を保持しておくbuffer
 char buffer[] = "00:00:00";
+char* axis_direction;
+int32_t x_direction = 0;
+int32_t y_direction = 0;
+int32_t z_direction = 0;
 
+// テキストレイヤを作成
 void create_text_layer(){
+  // 名言レイや
   text_layer = text_layer_create(GRect(0, 0, 146, 168));
   text_layer_set_background_color(text_layer, GColorClear);
   text_layer_set_text_color(text_layer, GColorBlack);
 
+  // 時間レイや
   time_layer = text_layer_create(GRect(0, 53, 146, 84));
   text_layer_set_background_color(time_layer, GColorClear);
   text_layer_set_text_color(time_layer, GColorBlack);
+
+  // 時間レイや
+  acc_layer = text_layer_create(GRect(0, 100, 146, 168));
+  text_layer_set_background_color(acc_layer, GColorClear);
+  text_layer_set_text_color(acc_layer, GColorBlack);
 }
 
 void set_text_layer(){
   text_layer_set_text(text_layer, "Divide each difficulty into as many parts as is feasible and necessary to resolve it.");
+
+  text_layer_set_text(acc_layer, "hoge");
 }
 
 // アニメーションが停止した際のハンドラ
@@ -47,6 +62,58 @@ void animate_layer(Layer *layer, GRect *start, GRect *finish, int duration, int 
 
   // アニメーション開始
   animation_schedule((Animation*)anim);
+}
+
+
+char *itoa(int32_t num)
+{
+  static char buff[20] = {};
+  int i = 0, temp_num = num, digits = 0;
+
+  if (num < 0){
+    num *= -1;
+  }
+
+  char *string = buff;
+
+  while(temp_num){
+    temp_num /= 10;
+    digits++;
+  }
+
+  for (i = 0; i < digits; i++){
+    buff[digits - 1 - i] = '0' + (num % 10);
+    num /= 10;
+  }
+  buff[i] = '\0';
+
+  return string;
+}
+
+static void accel_tap_handler(AccelAxisType axis, int32_t direction){
+  switch(axis){
+  case ACCEL_AXIS_X:
+    x_direction = direction;
+    break;
+  case ACCEL_AXIS_Y:
+    y_direction = direction;
+    break;
+  case ACCEL_AXIS_Z:
+    z_direction = direction;
+    break;
+  }
+
+  char* x = itoa(x_direction);
+  char* y = itoa(y_direction);
+  char* z = itoa(z_direction);
+
+  axis_direction = "";
+
+  strcat(axis_direction, x);
+  strcat(axis_direction, y);
+  strcat(axis_direction, z);
+
+  text_layer_set_text(acc_layer, "tapped");
 }
 
 
@@ -86,6 +153,7 @@ void window_load(Window *window){
   
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(text_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(acc_layer));
   
   set_text_layer();
 
@@ -95,6 +163,8 @@ void window_load(Window *window){
 // deinit window
 void window_unload(Window *window){
   text_layer_destroy(text_layer);
+  text_layer_destroy(time_layer);
+  text_layer_destroy(acc_layer);
 }
 
 void init()
@@ -109,6 +179,8 @@ void init()
   window_stack_push(window, true);
 
   tick_timer_service_subscribe(SECOND_UNIT, (TickHandler) tick_handler);
+
+  accel_tap_service_subscribe(accel_tap_handler);
 }
  
 void deinit()
@@ -117,6 +189,7 @@ void deinit()
   window_destroy(window);
 
   tick_timer_service_unsubscribe();
+  accel_tap_service_unsubscribe();
 }
 
 int main(void)
