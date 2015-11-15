@@ -15,7 +15,7 @@ void create_text_layer(){
   text_layer_set_background_color(text_layer, GColorClear);
   text_layer_set_text_color(text_layer, GColorBlack);
 
-  time_layer = text_layer_create(GRect(0, 84, 146, 84));
+  time_layer = text_layer_create(GRect(0, 53, 146, 84));
   text_layer_set_background_color(time_layer, GColorClear);
   text_layer_set_text_color(time_layer, GColorBlack);
 }
@@ -30,6 +30,7 @@ void on_animation_stopped(Animation *anim, bool finished, void *context){
   property_animation_destroy((PropertyAnimation*) anim);
 }
 
+// アニメーションレイヤ
 void animate_layer(Layer *layer, GRect *start, GRect *finish, int duration, int delay){
   // アニメーション構造体の宣言
   PropertyAnimation *anim = property_animation_create_layer_frame(layer, start, finish);
@@ -53,7 +54,21 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
   // update window
   strftime(buffer, sizeof("00:00:00"), "%H:%M:%S", tick_time);
 
-  text_layer_set_text(time_layer, buffer);
+  int seconds = tick_time->tm_sec;
+
+  if(seconds == 59){
+    //Slide offscreen to the right
+    GRect start = GRect(0, 53, 144, 168);
+    GRect finish = GRect(144, 53, 144, 168);
+    animate_layer(text_layer_get_layer(time_layer), &start, &finish, 300, 500);
+  }else if(seconds == 0){
+    //Slide offscreen to the left
+    GRect start = GRect(-144, 53, 144, 168);
+    GRect finish = GRect(0, 53, 144, 168);
+    animate_layer(text_layer_get_layer(time_layer), &start, &finish, 300, 500);
+  }else{
+    text_layer_set_text(time_layer, buffer);    
+  }
 }
 
 void init_time(){
@@ -87,9 +102,9 @@ void init()
   //Initialize the app elements here!
   window = window_create();
   window_set_window_handlers(window, (WindowHandlers) {
-    .load = window_load,
-    .unload = window_unload,
-  });
+      .load = window_load,
+	.unload = window_unload,
+	});
   
   window_stack_push(window, true);
 
