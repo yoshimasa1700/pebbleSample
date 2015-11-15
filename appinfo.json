@@ -1,25 +1,20 @@
 {
-  "appKeys": {},
-  "capabilities": [
-    ""
-  ],
-  "companyName": "m.yoshi.1700@gmail.com",
-  "longName": "Tutorial Part 1",
-  "projectType": "native",
-  "resources": {
-    "media": []
-  },
-  "sdkVersion": "3",
-  "shortName": "Tutorial Part 1",
-  "uuid": "18dab804-53e1-4fb4-a306-dedace1c6ea4",
-  "versionCode": 1,
-  "versionLabel": "1.0",
-  "watchapp": {
-    "watchface": true
-  },
-  "targetPlatforms": [
-    "aplite",
-    "basalt",
-    "chalk"
-  ]
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "m.yoshi.1700@gmail.com",
+    "longName": "Tutorial Part 1",
+    "projectType": "native",
+    "resources": {
+        "media": []
+    },
+    "sdkVersion": "2",
+    "shortName": "Tutorial Part 1",
+    "uuid": "18dab804-53e1-4fb4-a306-dedace1c6ea4",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
 }
