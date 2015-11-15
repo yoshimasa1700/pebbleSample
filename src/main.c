@@ -11,10 +11,7 @@ TextLayer *acc_raw_layer;
 
 // 時間を保持しておくbuffer
 char buffer[] = "00:00:00";
-char* axis_direction;
-int32_t x_direction = 0;
-int32_t y_direction = 0;
-int32_t z_direction = 0;
+
 
 // テキストレイヤを作成
 void create_text_layer(){
@@ -37,7 +34,6 @@ void create_text_layer(){
   acc_layer = text_layer_create(GRect(0, 80, 146, 168));
   text_layer_set_background_color(acc_raw_layer, GColorClear);
   text_layer_set_text_color(acc_raw_layer, GColorBlack);
-  
 }
 
 void set_text_layer(){
@@ -98,13 +94,13 @@ char *itoa(int32_t num)
 static void accel_tap_handler(AccelAxisType axis, int32_t direction){
   switch(axis){
   case ACCEL_AXIS_X:
-    text_layer_set_text(acc_layer, axis_direction);
+    text_layer_set_text(acc_layer, "x tapped");
     break;
   case ACCEL_AXIS_Y:
-    text_layer_set_text(acc_layer, axis_direction);
+    text_layer_set_text(acc_layer, "y tapped");
     break;
   case ACCEL_AXIS_Z:
-    text_layer_set_text(acc_layer, axis_direction);
+    text_layer_set_text(acc_layer, "z tapped");
     break;
   }
 }
