@@ -7,6 +7,7 @@ Window *window;
 TextLayer *text_layer;
 TextLayer *time_layer;
 TextLayer *acc_layer;
+TextLayer *acc_raw_layer;
 
 // 時間を保持しておくbuffer
 char buffer[] = "00:00:00";
@@ -22,21 +23,25 @@ void create_text_layer(){
   text_layer_set_background_color(text_layer, GColorClear);
   text_layer_set_text_color(text_layer, GColorBlack);
 
-  // 時間レイや
+  // 時間レイヤ
   time_layer = text_layer_create(GRect(0, 53, 146, 84));
   text_layer_set_background_color(time_layer, GColorClear);
   text_layer_set_text_color(time_layer, GColorBlack);
 
-  // 時間レイや
-  acc_layer = text_layer_create(GRect(0, 100, 146, 168));
+  // tap 検知レイヤ
+  acc_layer = text_layer_create(GRect(0, 66, 146, 168));
   text_layer_set_background_color(acc_layer, GColorClear);
   text_layer_set_text_color(acc_layer, GColorBlack);
+
+  // acc raw　レイヤ
+  acc_layer = text_layer_create(GRect(0, 80, 146, 168));
+  text_layer_set_background_color(acc_raw_layer, GColorClear);
+  text_layer_set_text_color(acc_raw_layer, GColorBlack);
+  
 }
 
 void set_text_layer(){
   text_layer_set_text(text_layer, "Divide each difficulty into as many parts as is feasible and necessary to resolve it.");
-
-  text_layer_set_text(acc_layer, "hoge");
 }
 
 // アニメーションが停止した際のハンドラ
@@ -93,27 +98,22 @@ char *itoa(int32_t num)
 static void accel_tap_handler(AccelAxisType axis, int32_t direction){
   switch(axis){
   case ACCEL_AXIS_X:
-    x_direction = direction;
+    text_layer_set_text(acc_layer, axis_direction);
     break;
   case ACCEL_AXIS_Y:
-    y_direction = direction;
+    text_layer_set_text(acc_layer, axis_direction);
     break;
   case ACCEL_AXIS_Z:
-    z_direction = direction;
+    text_layer_set_text(acc_layer, axis_direction);
     break;
   }
+}
 
-  char* x = itoa(x_direction);
-  char* y = itoa(y_direction);
-  char* z = itoa(z_direction);
-
-  axis_direction = "";
-
-  strcat(axis_direction, x);
-  strcat(axis_direction, y);
-  strcat(axis_direction, z);
-
-  text_layer_set_text(acc_layer, axis_direction);
+static void accel_raw_handler(AccelData *data, uint32_t num_samples)
+{
+  static char buffer[] = "XYZ: 9999 / 9999 / 9999";
+  snprintf(buffer, sizeof("XYZ: 9999 / 9999 / 9999"), "XYZ: %d / %d / %d", data[0].x, data[0].y, data[0].z);
+  text_layer_set_text(acc_raw_layer, buffer);
 }
 
 
@@ -154,6 +154,7 @@ void window_load(Window *window){
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(text_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(acc_layer));
+    layer_add_child(window_get_root_layer(window), text_layer_get_layer(acc_raw_layer));
   
   set_text_layer();
 
@@ -181,6 +182,7 @@ void init()
   tick_timer_service_subscribe(SECOND_UNIT, (TickHandler) tick_handler);
 
   accel_tap_service_subscribe(accel_tap_handler);
+  accel_data_service_subscribe(1, accel_raw_handler);
 }
  
 void deinit()
@@ -190,6 +192,7 @@ void deinit()
 
   tick_timer_service_unsubscribe();
   accel_tap_service_unsubscribe();
+  accel_data_service_unsubscribe();
 }
 
 int main(void)
