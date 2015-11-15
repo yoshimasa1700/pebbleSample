@@ -113,7 +113,7 @@ static void accel_tap_handler(AccelAxisType axis, int32_t direction){
   strcat(axis_direction, y);
   strcat(axis_direction, z);
 
-  text_layer_set_text(acc_layer, "tapped");
+  text_layer_set_text(acc_layer, axis_direction);
 }
 
 
