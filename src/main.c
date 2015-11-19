@@ -11,6 +11,7 @@ void create_text_layer(){
 
   // 時間レイヤ
   time_layer = text_layer_create(GRect(0, 53, 146, 84));
+  text_layer_set_font(time_layer, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD));
   text_layer_set_background_color(time_layer, GColorClear);
   text_layer_set_text_color(time_layer, GColorBlack);
 
