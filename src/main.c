@@ -1,17 +1,6 @@
-#include <pebble.h>
-
-// ウィンドウ構造体
-Window *window;
-
-// テキストレイヤ
-TextLayer *text_layer;
-TextLayer *time_layer;
-TextLayer *acc_layer;
-TextLayer *acc_raw_layer;
-
-// 時間を保持しておくbuffer
-char buffer[] = "00:00:00";
-
+#include "global.h"
+#include "accHandlers.h"
+#include "animationHandlers.h"
 
 // テキストレイヤを作成
 void create_text_layer(){
@@ -40,32 +29,6 @@ void set_text_layer(){
   text_layer_set_text(text_layer, "Divide each difficulty into as many parts as is feasible and necessary to resolve it.");
 }
 
-// アニメーションが停止した際のハンドラ
-void on_animation_stopped(Animation *anim, bool finished, void *context){
-  // メモリ解放
-  property_animation_destroy((PropertyAnimation*) anim);
-}
-
-// アニメーションレイヤ
-void animate_layer(Layer *layer, GRect *start, GRect *finish, int duration, int delay){
-  // アニメーション構造体の宣言
-  PropertyAnimation *anim = property_animation_create_layer_frame(layer, start, finish);
-
-  // アニメの特徴を設定
-  animation_set_duration((Animation*)anim, duration);
-  animation_set_delay((Animation*)anim, delay);
-
-  // アニメが停止した際にメモリを解放するためのハンドラを設定
-  AnimationHandlers handlers = {
-    .stopped = (AnimationStoppedHandler) on_animation_stopped
-  };
-  animation_set_handlers((Animation*)anim, handlers, NULL);
-
-  // アニメーション開始
-  animation_schedule((Animation*)anim);
-}
-
-
 char *itoa(int32_t num)
 {
   static char buff[20] = {};
@@ -90,28 +53,6 @@ char *itoa(int32_t num)
 
   return string;
 }
-
-static void accel_tap_handler(AccelAxisType axis, int32_t direction){
-  switch(axis){
-  case ACCEL_AXIS_X:
-    text_layer_set_text(acc_layer, "x tapped");
-    break;
-  case ACCEL_AXIS_Y:
-    text_layer_set_text(acc_layer, "y tapped");
-    break;
-  case ACCEL_AXIS_Z:
-    text_layer_set_text(acc_layer, "z tapped");
-    break;
-  }
-}
-
-static void accel_raw_handler(AccelData *data, uint32_t num_samples)
-{
-  static char buffer[] = "XYZ: 9999 / 9999 / 9999";
-  snprintf(buffer, sizeof("XYZ: 9999 / 9999 / 9999"), "XYZ: %d / %d / %d", data[0].x, data[0].y, data[0].z);
-  text_layer_set_text(acc_raw_layer, buffer);
-}
-
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
   // update window
