@@ -20,38 +20,13 @@ void create_text_layer(){
   text_layer_set_text_color(acc_layer, GColorBlack);
 
   // acc raw　レイヤ
-  acc_layer = text_layer_create(GRect(0, 80, 146, 168));
+  acc_raw_layer = text_layer_create(GRect(0, 80, 146, 168));
   text_layer_set_background_color(acc_raw_layer, GColorClear);
   text_layer_set_text_color(acc_raw_layer, GColorBlack);
 }
 
 void set_text_layer(){
   text_layer_set_text(text_layer, "Divide each difficulty into as many parts as is feasible and necessary to resolve it.");
-}
-
-char *itoa(int32_t num)
-{
-  static char buff[20] = {};
-  int i = 0, temp_num = num, digits = 0;
-
-  if (num < 0){
-    num *= -1;
-  }
-
-  char *string = buff;
-
-  while(temp_num){
-    temp_num /= 10;
-    digits++;
-  }
-
-  for (i = 0; i < digits; i++){
-    buff[digits - 1 - i] = '0' + (num % 10);
-    num /= 10;
-  }
-  buff[i] = '\0';
-
-  return string;
 }
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed){
@@ -73,6 +48,7 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed){
   }else{
     text_layer_set_text(time_layer, buffer);    
   }
+  text_layer_set_text(acc_layer, "");
 }
 
 void init_time(){
@@ -91,7 +67,7 @@ void window_load(Window *window){
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(text_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(acc_layer));
-    layer_add_child(window_get_root_layer(window), text_layer_get_layer(acc_raw_layer));
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(acc_raw_layer));
   
   set_text_layer();
 
@@ -103,6 +79,7 @@ void window_unload(Window *window){
   text_layer_destroy(text_layer);
   text_layer_destroy(time_layer);
   text_layer_destroy(acc_layer);
+  text_layer_destroy(acc_raw_layer);
 }
 
 void init()
